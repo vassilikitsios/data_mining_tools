@@ -35,8 +35,8 @@ def read_and_clean_data():
 	# total population
 	df_pop=pd.read_csv('./0data/indicator_gapminder_population.csv', header=0,index_col=0)
 	# the year that the country entres into the oecd
-	df_oecd=pd.read_csv('./0data/classifier_oecd.csv', header=0,index_col=0)
-	df_oecd = df_oecd.T.ffill().T		# forward fill missing values
+	#df_oecd=pd.read_csv('./0data/classifier_oecd.csv', header=0,index_col=0)
+	#df_oecd = df_oecd.T.ffill().T		# forward fill missing values
 
 	#-------------------------------------------------------------
 	# Stack

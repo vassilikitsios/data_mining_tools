@@ -14,6 +14,8 @@ import m_clean as cl
 import m_machine_learning as ml
 import m_visualisation as vis
 import m_io as io 
+import m_theano_logistic_regression as thlr
+import m_theano_neural_net as thnn
 
 #=====================================================================
 # README:
@@ -24,7 +26,7 @@ import m_io as io
 # 	classification of OECD countries with regularisation and learning curves
 
 # To run code with plots output to command line
-#	ipython qtconsole --pylab=inline
+#	~/Applications/anaconda/bin/ipython qtconsole --pylab=inline
 
 #=====================================================================
 # to do list:
@@ -44,8 +46,10 @@ if __name__ == '__main__':
 	#-------------------------------------------------------------
 	perform_regression = False
 	#perform_regression = True
+
 	#perform_classification = False
 	perform_classification = True
+
 	perform_visualisation = False
 	#perform_visualisation = True
 
@@ -72,11 +76,14 @@ if __name__ == '__main__':
 	#-------------------------------------------------------------
 	if (perform_classification):
 		Xpos,Xneg,ypos,yneg = cl.set_up_classification_matrices(df2)
-		ml.perform_logistic_classification(Xpos,Xneg,ypos,yneg,"oecd","l1")
-		ml.perform_logistic_classification(Xpos,Xneg,ypos,yneg,"oecd","l2")
-		max_degree = 1			# degree of polynomial feature Kernal, degree 0 is Gaussian
-		for d in range(0,max_degree+1):
-			ml.perform_svm_classification(Xpos,Xneg,ypos,yneg,"oecd",d)
+		#ml.perform_logistic_classification(Xpos,Xneg,ypos,yneg,"oecd","l1")
+		#ml.perform_logistic_classification(Xpos,Xneg,ypos,yneg,"oecd","l2")
+		#max_degree = 1			# degree of polynomial feature Kernal, degree 0 is Gaussian
+		#for d in range(0,max_degree+1):
+		#	ml.perform_svm_classification(Xpos,Xneg,ypos,yneg,"oecd",d)
+		#thlr.perform_classification(Xpos,Xneg,ypos,yneg)
+		#thnn.perform_classification(Xpos,Xneg,ypos,yneg,"oecd","l1")
+		thnn.perform_classification(Xpos,Xneg,ypos,yneg,"oecd","l2")
 		del Xpos, Xneg, ypos, yneg
 
 	#-------------------------------------------------------------

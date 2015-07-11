@@ -81,9 +81,7 @@ def split_data(X, y, p=1.0, print_output=False):
 		X_train, X_val, X_test, y_train, y_val, y_test
 
 #=====================================================================
-def evaluate_classification_model_performance(model, X, y, print_output=False, file_prefix=''):
-	y_predict = model.predict(X.T)
-	score = model.score(X.T,y)			# score
+def evaluate_classification_model_performance(y_predict, X, y, print_output=False, file_prefix=''):
 	P = 0						# precision  = True positive / (True positive + False positive)
 	if (np.sum(y_predict)>0):
 		P = np.sum(y_predict*y) / np.sum(y_predict)
@@ -94,24 +92,24 @@ def evaluate_classification_model_performance(model, X, y, print_output=False, f
 	if (P+R>0):
 		F1 = 2.0*P*R/(P+R)
 	if (print_output):
+		print("      num positive = {0}".format(np.sum(y)))
+		print("      num predicted positive = {0}".format(np.sum(y_predict)))
+		print("      num correctly predicted = {0}".format(np.sum(y_predict*y)))
 		print("      precision = {0}".format(P))
 		print("      recall = {0}".format(R))
 		print("      F1 score = {0}".format(F1))
-		print("      score = {0}".format(score))
-	return P, R, F1, score
+	return P, R, F1
 
 #=====================================================================
-def evaluate_regression_model_performance(model, X, y, print_output=False, plot_output=False, file_prefix=''):
-	y_predict = model.predict(X.T)
+def evaluate_regression_model_performance(y_predict, X, y, print_output=False, plot_output=False, file_prefix=''):
 	error = np.sum((y_predict-y)**2.0)/len(y)
-	score = model.score(X.T,y)
 	if (print_output):
 		print("      squared error = {0}".format(error))
 		print("      score = {0}".format(score))
 	if (plot_output):
 		vis.compare_prediction(y, y_predict,file_prefix+'prediction.png')
 		vis.compare_error(y, y_predict,file_prefix+'error.png')
-	return error, score
+	return error
 
 #=====================================================================
 def regularise_classification_model(model, Xpos, Xneg, ypos, yneg, alphas, var_name):
@@ -130,22 +128,22 @@ def regularise_classification_model(model, Xpos, Xneg, ypos, yneg, alphas, var_n
 	for i,a in enumerate(alphas):
 		print("         regularisation parameter = {0}".format(a))
 		model.set_params(C=a).fit(X_train.T, y_train)
-		P_train[i], R_train[i], F1_train[i], scores_train[i] \
-			= evaluate_classification_model_performance(model,X_train,y_train)
-		P_val[i],   R_val[i],   F1_val[i],   scores_val[i]   \
-			= evaluate_classification_model_performance(model,X_val,y_val)
+		scores_train[i] = model.score(X_train.T,y_train)
+		scores_val[i] = model.score(X_val.T,y_val)
+		P_train[i], R_train[i], F1_train[i] = evaluate_classification_model_performance(model.predict(X_train.T),X_train,y_train)
+		P_val[i],   R_val[i],   F1_val[i] = evaluate_classification_model_performance(model.predict(X_val.T),X_val,y_val)
 	best_alpha = alphas[np.argmax(F1_val)]
 	model.set_params(C=best_alpha).fit(X_train.T, y_train)
 	print("      regularisation value  of best fit = {0}".format(best_alpha))
 
 	print("\n   Evaluating performance of model on training data set ...")
-	P, R, F1, score = evaluate_classification_model_performance(model,X_train,y_train, print_output=True,\
+	P, R, F1 = evaluate_classification_model_performance(model.predict(X_train.T),X_train,y_train, print_output=True,\
 		file_prefix='classification.'+var_name+'.train_')
 	print("\n   Evaluating performance of model on validation data set ...")
-	P, R, F1, score = evaluate_classification_model_performance(model,X_val,y_val,print_output=True,\
+	P, R, F1 = evaluate_classification_model_performance(model.predict(X_val.T),X_val,y_val,print_output=True,\
 		file_prefix='classification.'+var_name+'.validation_')
 	print("\n   Evaluating performance of model on test data set ...")
-	P, R, F1, score = evaluate_classification_model_performance(model,X_test,y_test,print_output=True,\
+	P, R, F1 = evaluate_classification_model_performance(model.predict(X_test.T),X_test,y_test,print_output=True,\
 		file_prefix='classification.'+var_name+'.test_')
 
 	vis.plot_error_versus_alpha(alphas, P_val, P_train, 'precision', 'regularisation parameter', 'logX',\
@@ -176,8 +174,10 @@ def regularise_regression_model(model, X, y, alphas, var_name):
 		X_train, X_val, X_test, y_train, y_val, y_test = split_data(X,y)
 	for i,a in enumerate(alphas):
 		model.set_params(alpha=a).fit(X_train.T, y_train)
-		errors_train[i], scores_train[i] = evaluate_regression_model_performance(model,X_train,y_train)
-		errors_val[i], scores_val[i] = evaluate_regression_model_performance(model,X_val,y_val)
+		scores_train[i] = model.score(X_train.T,y_train)
+		scores_val[i] = model.score(X_val.T,y_val)
+		errors_train[i] = evaluate_regression_model_performance(model.predict(X_train.T),X_train,y_train)
+		errors_val[i] = evaluate_regression_model_performance(model.predict(X_val.T),X_val,y_val)
 
 	best_alpha = alphas[np.argmin(errors_val)]
 	model.set_params(alpha=best_alpha).fit(X_train.T, y_train)
@@ -185,13 +185,13 @@ def regularise_regression_model(model, X, y, alphas, var_name):
 	print("      model coefficients = {0}\n".format(model.coef_))
 
 	print("\n   Evaluating performance of model on training data set ...")
-	error, score = evaluate_regression_model_performance(model,X_train,y_train, print_output=True,plot_output=True,\
+	error = evaluate_regression_model_performance(model.predict(X_train.T),X_train,y_train, print_output=True,plot_output=True,\
 		file_prefix='regression.'+var_name+'.train_')
 	print("\n   Evaluating performance of model on validation data set ...")
-	error, score = evaluate_regression_model_performance(model,X_val,y_val,print_output=True,plot_output=True,\
+	error = evaluate_regression_model_performance(model.predict(X_val.T),X_val,y_val,print_output=True,plot_output=True,\
 		file_prefix='regression.'+var_name+'.validation_')
 	print("\n   Evaluating performance of model on test data set ...")
-	error, score = evaluate_regression_model_performance(model,X_test,y_test,print_output=True,plot_output=True,\
+	error = evaluate_regression_model_performance(model.predict(X_test.T),X_test,y_test,print_output=True,plot_output=True,\
 		file_prefix='regression.'+var_name+'.test_')
 
 	vis.plot_error_versus_alpha(alphas, errors_val, errors_train, 'squared error', 'regularisation parameter', 'logXY',\
@@ -223,10 +223,10 @@ def calculate_classification_learning_curves(model, Xpos, Xneg, ypos, yneg, var_
 		num_samples, num_train_samples, num_val_samples, num_test_samples, \
 			X_train, X_val, X_test, y_train, y_val, y_test = split_classification_data(Xpos, Xneg, ypos, yneg, p)
 		model.fit(X_train.T, y_train)
-		P_train_lc[i], R_train_lc[i], F1_train_lc[i], scores_train_lc[i] \
-			= evaluate_classification_model_performance(model,X_train,y_train)
-		P_val_lc[i], R_val_lc[i], F1_val_lc[i], scores_val_lc[i] \
-			= evaluate_classification_model_performance(model,X_val,y_val)
+		scores_train_lc[i] = model.score(X_train.T,y_train)
+		scores_val_lc[i] = model.score(X_val.T,y_val)
+		P_train_lc[i],R_train_lc[i],F1_train_lc[i]=evaluate_classification_model_performance(model.predict(X_train.T),X_train,y_train)
+		P_val_lc[i],R_val_lc[i],F1_val_lc[i]=evaluate_classification_model_performance(model.predict(X_val.T),X_val,y_val)
 		del  X_train, X_val, X_test, y_train, y_val, y_test
 
 	vis.plot_error_versus_alpha(proportion_of_samples, P_val_lc, P_train_lc, 'precision', \
@@ -259,8 +259,10 @@ def calculate_regression_learning_curves(model, X, y, var_name):
 		num_samples, num_train_samples, num_val_samples, num_test_samples, \
 			X_train, X_val, X_test, y_train, y_val, y_test = split_data(X,y,p)
 		model.fit(X_train.T, y_train)
-		errors_train_lc[i], scores_train_lc[i] = evaluate_regression_model_performance(model,X_train,y_train)
-		errors_val_lc[i], scores_val_lc[i] = evaluate_regression_model_performance(model,X_val,y_val)
+		scores_val_lc[i] = model.predict(X_val.T,y_val) 
+		scores_train_lc[i] = model.predict(X_train.T,y_train)
+		errors_train_lc[i] = evaluate_regression_model_performance(model.predict(X_train.T),X_train,y_train)
+		errors_val_lc[i] = evaluate_regression_model_performance(model.predict(X_val.T),X_val,y_val)
 		del  X_train, X_val, X_test, y_train, y_val, y_test
 
 	vis.plot_error_versus_alpha(proportion_of_samples, errors_val_lc, errors_train_lc, 'squared error', \
