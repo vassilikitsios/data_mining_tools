@@ -1,6 +1,7 @@
 #=====================================================================
 """A multilayer perceptron is a logistic regressor where instead of feeding the input to the logistic regression you insert a
-intermediate layer, called the hidden layer, that has a nonlinear activation function (usually tanh or sigmoid)."""
+intermediate layer, called the hidden layer, that has a nonlinear activation function (usually tanh or sigmoid).
+Theano code modified from theano tutorials."""
 __docformat__ = 'restructedtext en'
 
 #=====================================================================
