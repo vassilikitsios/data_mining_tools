@@ -27,7 +27,7 @@ class HiddenLayer(object):
 
 	#---------------------------------------------------------------------
 	def __init__(self, rng, input, n_in, n_out, W=None, b=None, activation=T.tanh):
-	        """ Typical hidden layer of a MLP: units are fully-connected and have sigmoidal activation function.
+		""" Typical hidden layer of a MLP: units are fully-connected and have sigmoidal activation function.
 		Weight matrix W is of shape (n_in,n_out) and the bias vector b is of shape (n_out,).
 		By default the nonlinearity used here is tanh, with the hidden unit activation given by: tanh(dot(input,W) + b).
 			rng (numpy.random.RandomState) : a random number generator used to initialize weights
@@ -37,7 +37,7 @@ class HiddenLayer(object):
 			activation (theano.Op or function) : Non linearity to be applied in the hidden layer """
 		self.input = input
 
-        	""" `W` is initialized with `W_values` which is uniformely sampled from sqrt(-6./(n_in+n_hidden)) and sqrt(6./(n_in+n_hidden))
+		""" `W` is initialized with `W_values` which is uniformely sampled from sqrt(-6./(n_in+n_hidden)) and sqrt(6./(n_in+n_hidden))
 	        for tanh activation function the output of uniform if converted using asarray to dtype
 		theano.config.floatX so that the code is runable on GPU
 	        Optimal initialization of weights is dependent on the activation function used (among other things).
@@ -173,7 +173,7 @@ def build_model(data_train_set_x, data_valid_set_x, data_test_set_x, data_train_
 		y: train_set_y[index * batch_size: (index + 1) * batch_size] })
 
         #---------------------------------------------------------------------
-        print('Training the model ...')
+	print('Training the model ...')
 	patience = 10000						# look as this many examples regardless
 	patience_increase = 2						# wait this much longer when a new best is found
 	improvement_threshold = 0.995					# a relative improvement of this much is considered significant

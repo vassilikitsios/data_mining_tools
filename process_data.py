@@ -27,13 +27,14 @@ import m_theano_neural_net as thnn
 # 	classification of OECD countries with regularisation and learning curves
 
 # To run code with plots output to command line
-#	~/Applications/anaconda/bin/ipython qtconsole --pylab=inline
+#	ipython qtconsole --pylab=inline
 
 #=====================================================================
 # to do list:
 #=====================================================================
 # 1) wrap up regression and classification subroutines into a python class
-# 2) implement wrangling option using MongoDB, Hadoop
+# 2) implement database options for: MongoDB; Hadoop; Spark
+
 #=====================================================================
 # Main program
 #=====================================================================
@@ -44,8 +45,8 @@ if __name__ == '__main__':
 	print('===================================================\n')
 
 	#-------------------------------------------------------------
-	perform_regression = False
-	#perform_regression = True
+	#perform_regression = False
+	perform_regression = True
 
 	#perform_classification = False
 	perform_classification = True
@@ -53,12 +54,20 @@ if __name__ == '__main__':
 	perform_visualisation = False
 	#perform_visualisation = True
 
+	database = 'pandas'
+	#database = 'SQL'
+
 	#-------------------------------------------------------------
-	df_orig  = cl.read_and_clean_data('./0data')		# read data, drop redundant fields and save in pandas database
-	df  = cl_sql.read_and_clean_data('./0data.sql_format')	# read data and drop redundant fields and save in sql database
+	if (database == "pandas"):
+		df  = cl.read_and_clean_data('./0data')			# read data, drop redundant fields and save in pandas database
+	elif (database == "SQL"):
+		df  = cl_sql.read_and_clean_data('./0data.sql_format')	# read data and drop redundant fields and save in sql database
+	else:
+		print("database type '{0}' not supported".format(database))
+		print("      try: 'pandas' or 'SQL'")
+		sys.exit()
 
-	sys.exit()
-
+	#-------------------------------------------------------------
 	df2 = (df - df.mean()) / df.std()	# standardise
 	df2 = df2.dropna()			# drop missing values
 
@@ -70,8 +79,13 @@ if __name__ == '__main__':
 
 	#-------------------------------------------------------------
 	if (perform_classification) or (perform_visualisation):
-		df_oecd=pd.read_csv('./0data/classifier_oecd.csv', header=0,index_col=0)
-		df_oecd = df_oecd.T.ffill().T							# forward fill missing values
+		if (database == "pandas"):
+			df_oecd = pd.read_csv('./0data/classifier_oecd.csv', header=0,index_col=0)
+			df_oecd = df_oecd.T.ffill().T						# forward fill missing values
+		elif (database == "SQL"):
+			df_oecd = cl_sql.read_field('./0data.sql_format', 'oecd', 'oecd')
+			df_oecd = df_oecd.ffill()						# forward fill missing values
+		df_oecd.fillna(0,inplace=True)
 		df_oecd_s = pd.DataFrame(df_oecd.stack().values, columns=['oecd'], index=df_oecd.stack().index)
 		df2 = pd.merge(df2,df_oecd_s,left_index=True,right_index=True,how='outer')	# add oecd classification field
 		df2 = df2.unstack(0).bfill().ffill().stack()					# back & forward fill missing values
@@ -80,12 +94,12 @@ if __name__ == '__main__':
 	#-------------------------------------------------------------
 	if (perform_classification):
 		Xpos,Xneg,ypos,yneg = cl.set_up_classification_matrices(df2)
-		#ml.perform_logistic_classification(Xpos,Xneg,ypos,yneg,"oecd","l1")
-		#ml.perform_logistic_classification(Xpos,Xneg,ypos,yneg,"oecd","l2")
-		#max_degree = 1			# degree of polynomial feature Kernal, degree 0 is Gaussian
-		#for d in range(0,max_degree+1):
-		#	ml.perform_svm_classification(Xpos,Xneg,ypos,yneg,"oecd",d)
-		#thlr.perform_classification(Xpos,Xneg,ypos,yneg)
+		ml.perform_logistic_classification(Xpos,Xneg,ypos,yneg,"oecd","l1")
+		ml.perform_logistic_classification(Xpos,Xneg,ypos,yneg,"oecd","l2")
+		max_degree = 1			# degree of polynomial feature Kernal, degree 0 is Gaussian
+		for d in range(0,max_degree+1):
+			ml.perform_svm_classification(Xpos,Xneg,ypos,yneg,"oecd",d)
+		thlr.perform_classification(Xpos,Xneg,ypos,yneg)
 		thnn.perform_classification(Xpos,Xneg,ypos,yneg,"oecd","l1")
 		thnn.perform_classification(Xpos,Xneg,ypos,yneg,"oecd","l2")
 		del Xpos, Xneg, ypos, yneg

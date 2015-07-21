@@ -91,10 +91,9 @@ def read_and_clean_data(input_dir):
 	#df = df.dropna()
 
 	#-------------------------------------------------------------
-	scale_variables(df)
+	df = scale_variables(df)
 
 	return df
-	#return df_menSchool_s
 
 #=====================================================================
 def scale_variables(df):
@@ -106,8 +105,8 @@ def scale_variables(df):
 
 	# Calculate derived quantities
 	df_immigration_s= pd.DataFrame(df['popGrowth'] - df['birth'] + df['death'], columns=['immigration'], index=df.index)
-	df = pd.merge(df,df_immigration_s,left_index=True,right_index=True,how='outer')
-	return
+	df = pd.merge(df,df_immigration_s.copy(),left_index=True,right_index=True,how='outer')
+	return df
 
 #=====================================================================
 def set_up_pair_of_classification_matrices(df2):

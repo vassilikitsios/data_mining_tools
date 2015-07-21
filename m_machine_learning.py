@@ -15,8 +15,9 @@ import m_io as io
 
 #=====================================================================
 def shuffle_matrices(Z):
-	np.random.shuffle(Z.T)
-	np.random.shuffle(Z.T)
+	#ZT=Z.T
+	#np.random.shuffle(ZT)
+	#Z=ZT.T
 	np.random.shuffle(Z.T)
 	X = Z[:-1,:]
 	y = Z[-1,:]
@@ -105,7 +106,6 @@ def evaluate_regression_model_performance(y_predict, X, y, print_output=False, p
 	error = np.sum((y_predict-y)**2.0)/len(y)
 	if (print_output):
 		print("      squared error = {0}".format(error))
-		print("      score = {0}".format(score))
 	if (plot_output):
 		vis.compare_prediction(y, y_predict,file_prefix+'prediction.png')
 		vis.compare_error(y, y_predict,file_prefix+'error.png')
@@ -173,6 +173,7 @@ def regularise_regression_model(model, X, y, alphas, var_name):
 	num_samples, num_train_samples, num_val_samples, num_test_samples, \
 		X_train, X_val, X_test, y_train, y_val, y_test = split_data(X,y)
 	for i,a in enumerate(alphas):
+		print(np.shape(X_train.T),np.shape(y_train))
 		model.set_params(alpha=a).fit(X_train.T, y_train)
 		scores_train[i] = model.score(X_train.T,y_train)
 		scores_val[i] = model.score(X_val.T,y_val)
@@ -259,8 +260,8 @@ def calculate_regression_learning_curves(model, X, y, var_name):
 		num_samples, num_train_samples, num_val_samples, num_test_samples, \
 			X_train, X_val, X_test, y_train, y_val, y_test = split_data(X,y,p)
 		model.fit(X_train.T, y_train)
-		scores_val_lc[i] = model.predict(X_val.T,y_val) 
-		scores_train_lc[i] = model.predict(X_train.T,y_train)
+		scores_val_lc[i] = model.score(X_val.T,y_val) 
+		scores_train_lc[i] = model.score(X_train.T,y_train)
 		errors_train_lc[i] = evaluate_regression_model_performance(model.predict(X_train.T),X_train,y_train)
 		errors_val_lc[i] = evaluate_regression_model_performance(model.predict(X_val.T),X_val,y_val)
 		del  X_train, X_val, X_test, y_train, y_val, y_test

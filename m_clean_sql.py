@@ -15,6 +15,18 @@ import m_machine_learning as ml
 import m_clean as cl
 
 #=====================================================================
+def read_field(input_dir, database_name, table_name):
+	config = {'user': 'vassili', 'password': 'vk_mysql_pass', 'host': 'localhost', 'raise_on_warnings': True, 'allow_local_infile': True}
+	cnx = mysql.connector.connect(**config)
+	cur = cnx.cursor()
+	cur.execute('use {0};'.format(database_name))
+	df = pdsql.read_frame('select * from oecd.{0}'.format(table_name), cnx)
+	#df = pdsql.read_sql('select * from oecd.{0}'.format(var_name), cnx)
+	df.index = df['country']
+	del df['country']
+	return df.T
+
+#=====================================================================
 def read_and_clean_data(input_dir):
 
 	#-------------------------------------------------------------
@@ -43,37 +55,31 @@ def read_and_clean_data(input_dir):
 	# total population
 	input_data_properties.append(('pop',input_dir+'/indicator_gapminder_population.csv','double'))
 	# the year that the country entres into the oecd
-	input_data_properties.append(('oecd',input_dir+'/classifier_oecd.csv','double'))
+#	input_data_properties.append(('oecd',input_dir+'/classifier_oecd.csv','double'))
 
 	#-------------------------------------------------------------
-	# log into mysql
-	config = {
-		'user': 'vassili',
-		'password': 'vk_mysql_pass',
-		'host': 'localhost',
-		'raise_on_warnings': True,
-		'allow_local_infile': True,
-		}
+	config = {'user': 'vassili', 'password': 'vk_mysql_pass', 'host': 'localhost', 'raise_on_warnings': True, 'allow_local_infile': True}
 	cnx = mysql.connector.connect(**config)
 	cur = cnx.cursor()
 	
 	#-------------------------------------------------------------
 	# create database
 	database_name = 'oecd'
-	create_sql_database(cur,database_name)
+	#create_sql_database(cur,database_name)
 	cur.execute('use {0};'.format(database_name))
 
 	#-------------------------------------------------------------
 	# create mySQL tables and populate with data from file
 	for i in range(0,len(input_data_properties)):
 		var_name,filename,var_type = input_data_properties[i]
-		populate_sql_table(cur,var_name,filename,var_type)
+		#populate_sql_table(cur,var_name,filename,var_type)
 
 	#-------------------------------------------------------------
 	# read from mySQL into pandas data frame, then merge and align
 	for i in range(0,len(input_data_properties)):
 		var_name,filename,var_type = input_data_properties[i]
 		this_df = pdsql.read_frame('select * from oecd.{0}'.format(var_name), cnx)
+		#this_df = pdsql.read_sql('select * from oecd.{0}'.format(var_name), cnx)
 		this_df.index = this_df['country']
 		del this_df['country']
 		this_df_stacked = pd.DataFrame(this_df.T.stack().values,columns=[var_name],index=this_df.T.stack().index)
@@ -82,14 +88,11 @@ def read_and_clean_data(input_dir):
 		else:
         		df = pd.merge(df,this_df_stacked.copy(),left_index=True,right_index=True,how='outer')
 		del this_df, this_df_stacked
-			
 	cnx.close()
 
 	#-------------------------------------------------------------
-	df = df.dropna()
-	cl.scale_variables(df)
+	df = cl.scale_variables(df)
 
-	df = df.dropna()
 	return df
 
 #=====================================================================
@@ -100,8 +103,8 @@ def create_sql_database(cur,database_name):
 	except mysql.connector.Error as err:
 		if err.errno == 1007:
 			print("      already exists.\n")
-			#cur.execute("drop database {0};".format(database_name));
-			#cur.execute('create database if not exists {0};'.format(database_name))
+			cur.execute("drop database {0};".format(database_name));
+			cur.execute('create database if not exists {0};'.format(database_name))
 		else:
 			print(err.msg)
 	else:
@@ -118,10 +121,9 @@ def create_sql_table(cur,table_name):
 			");".format(table_name))
 	except mysql.connector.Error as err:
 		if err.errno == errorcode.ER_TABLE_EXISTS_ERROR:
-			print("      already exists.")
+			print("      already exists.\n")
 			cur.execute("drop table {0};".format(table_name));
-			cur.execute("create table if not exists `{0}` (`country` VARCHAR(200), PRIMARY KEY (`country`));"\
-				.format(table_name))
+			cur.execute("create table if not exists `{0}` (`country` VARCHAR(200), PRIMARY KEY (`country`));".format(table_name))
 		else:
 			print(err.msg)
 	else:
