@@ -102,7 +102,7 @@ class MLP(object):
 
 #=====================================================================
 def build_model(data_train_set_x, data_valid_set_x, data_test_set_x, data_train_set_y, data_valid_set_y, data_test_set_y, \
-	learning_rate=0.1, L1_reg=0.001, L2_reg=0.001, n_epochs=2000, batch_size=100, n_hidden=96):
+	learning_rate=0.1, L1_reg=0.001, L2_reg=0.001, n_epochs=2000, batch_size=100, n_hidden=24):
 	""" Stochastic gradient descent optimization for a multilayer perceptron
 		learning_rate (float) : learning rate factor used for the stochastic gradient
 		L1_reg (float) : L1-norm's weight when added to the cost 
@@ -349,7 +349,7 @@ def perform_classification(Xpos, Xneg, ypos, yneg, var_name, L):
 	if (L=="l2"):
 		L1_flag=0
 		L2_flag=1
-	alphas = np.logspace(-5, -1, 21)
+	alphas = np.logspace(-3, -1, 21)
 	best_alpha = regularise_classification_model(L1_flag, L2_flag, Xpos, Xneg, ypos, yneg, alphas, filename_prefix)
 	calculate_classification_learning_curves(L1_flag, L2_flag, best_alpha, Xpos, Xneg, ypos, yneg, filename_prefix)
 	return

@@ -4,38 +4,43 @@ import sys
 import pandas as pd
 import numpy as np
 import scipy as sci
+import string
 import sklearn as skl
 
 import m_machine_learning as ml
 
 #=====================================================================
-def read_and_clean_data():
+def read_and_clean_data(input_dir):
+
+	#-------------------------------------------------------------
+	# read data
+
 	# deaths per 1000 population per year
-	df_death=pd.read_csv('./0data/indicator_crude_death_rate__deaths_per_1000_population.csv', header=0,index_col=0)
+	df_death=pd.read_csv(input_dir+'/indicator_crude_death_rate__deaths_per_1000_population.csv', header=0,index_col=0)
 	# total births per year
-	df_birth=pd.read_csv('./0data/indicator_estimated_new_births.csv', header=0,index_col=0)
+	df_birth=pd.read_csv(input_dir+'/indicator_estimated_new_births.csv', header=0,index_col=0)
 	# deaths of children under 5 per 1000 population per year
-	df_deathU5=pd.read_csv('./0data/indicator_gapminder_under5mortality.csv', header=0,index_col=0)
+	df_deathU5=pd.read_csv(input_dir+'/indicator_gapminder_under5mortality.csv', header=0,index_col=0)
 	# gdp per capita PPP (purching power parity) - check website for more details
-	df_gdpPC=pd.read_csv('./0data/indicator_gdppercapita_with_projections.csv', header=0,index_col=0)
+	df_gdpPC=pd.read_csv(input_dir+'/indicator_gdppercapita_with_projections.csv', header=0,index_col=0)
 	# Per capita total expenditure on health at average exchange rate (US$)
-	df_healthPC=pd.read_csv('./0data/indicator_health_spending_per_person_US.csv', header=0,index_col=0)
+	df_healthPC=pd.read_csv(input_dir+'/indicator_health_spending_per_person_US.csv', header=0,index_col=0)
 	# average life expectancy at birth - check website for more details 
-	df_lifeExp=pd.read_csv('./0data/indicator_life_expectancy_at_birth_1800-2050.csv', header=0,index_col=0)
+	df_lifeExp=pd.read_csv(input_dir+'/indicator_life_expectancy_at_birth_1800-2050.csv', header=0,index_col=0)
 	# Per capita general government expenditure on health expressed at average exchange rate for that year in US dollars
-	df_healthPCGov=pd.read_csv('./0data/indicator_per_capita_government_expenditure_on_health_at_average_exchange_rate_US.csv', header=0,index_col=0)
+	df_healthPCGov=pd.read_csv(input_dir+'/indicator_per_capita_government_expenditure_on_health_at_average_exchange_rate_US.csv', header=0,index_col=0)
 	# Population growth (annual %). Derived from total population.
 	# Annual population growth rate for year t is the exponential rate of growth of midyear population from year t-1 to t.
 	# Population is based on the de facto definition of population, which counts all residents regardless of legal status or citizenship.
 	# Refugees not permanently settled in the country of asylum, are generally considered part of the population of the country of origin.
-	df_popGrowth=pd.read_csv('./0data/population_growth.csv', header=0,index_col=0)
+	df_popGrowth=pd.read_csv(input_dir+'/population_growth.csv', header=0,index_col=0)
 	# The average number of years of school (primary, secondary, tertiary) attended by all people in the age and gender group specified.
-	df_menSchool=pd.read_csv('./0data/Years_in_school_men_25_plus.csv', header=0,index_col=0)
-	df_womenSchool=pd.read_csv('./0data/Years_in_school_women_25_plus.csv', header=0,index_col=0)
+	df_menSchool=pd.read_csv(input_dir+'/Years_in_school_men_25_plus.csv', header=0,index_col=0)
+	df_womenSchool=pd.read_csv(input_dir+'/Years_in_school_women_25_plus.csv', header=0,index_col=0)
 	# total population
-	df_pop=pd.read_csv('./0data/indicator_gapminder_population.csv', header=0,index_col=0)
+	df_pop=pd.read_csv(input_dir+'/indicator_gapminder_population.csv', header=0,index_col=0)
 	# the year that the country entres into the oecd
-	#df_oecd=pd.read_csv('./0data/classifier_oecd.csv', header=0,index_col=0)
+	#df_oecd=pd.read_csv(input_dir+'/classifier_oecd.csv', header=0,index_col=0)
 	#df_oecd = df_oecd.T.ffill().T		# forward fill missing values
 
 	#-------------------------------------------------------------
@@ -66,13 +71,6 @@ def read_and_clean_data():
 	df = pd.merge(df,		df_pop_s,		left_index=True,right_index=True,how='outer')
 
 	#-------------------------------------------------------------
-	# Scale variables to consistent units
-	df['popGrowth']	= df['popGrowth'] / 100.0	# change from percentage to proportion	
-	df['death']	= df['death'] / 1000.0		# change from deaths per 1000 people to per capita
-	df['birth']	= df['birth'] / df['pop']	# change from total births to per capita 
-	df['deathU5']	= df['deathU5'] / 1000.0	# change from deaths per 1000 people to per capita
-
-	#-------------------------------------------------------------
 	# Outlier detection
 
 	#-------------------------------------------------------------
@@ -93,11 +91,23 @@ def read_and_clean_data():
 	#df = df.dropna()
 
 	#-------------------------------------------------------------
+	scale_variables(df)
+
+	return df
+	#return df_menSchool_s
+
+#=====================================================================
+def scale_variables(df):
+	# Scale variables to consistent units
+	df['popGrowth']	= df['popGrowth'] / 100.0	# change from percentage to proportion	
+	df['death']	= df['death'] / 1000.0		# change from deaths per 1000 people to per capita
+	df['birth']	= df['birth'] / df['pop']	# change from total births to per capita 
+	df['deathU5']	= df['deathU5'] / 1000.0	# change from deaths per 1000 people to per capita
+
 	# Calculate derived quantities
 	df_immigration_s= pd.DataFrame(df['popGrowth'] - df['birth'] + df['death'], columns=['immigration'], index=df.index)
 	df = pd.merge(df,df_immigration_s,left_index=True,right_index=True,how='outer')
-
-	return df
+	return
 
 #=====================================================================
 def set_up_pair_of_classification_matrices(df2):

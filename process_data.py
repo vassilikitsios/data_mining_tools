@@ -11,6 +11,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.svm import SVC
 
 import m_clean as cl
+import m_clean_sql as cl_sql
 import m_machine_learning as ml
 import m_visualisation as vis
 import m_io as io 
@@ -32,8 +33,7 @@ import m_theano_neural_net as thnn
 # to do list:
 #=====================================================================
 # 1) wrap up regression and classification subroutines into a python class
-# 2) change years from string to time series 
-
+# 2) implement wrangling option using MongoDB, Hadoop
 #=====================================================================
 # Main program
 #=====================================================================
@@ -54,7 +54,11 @@ if __name__ == '__main__':
 	#perform_visualisation = True
 
 	#-------------------------------------------------------------
-	df  = cl.read_and_clean_data()		# read data and drop redundant fields
+	df_orig  = cl.read_and_clean_data('./0data')		# read data, drop redundant fields and save in pandas database
+	df  = cl_sql.read_and_clean_data('./0data.sql_format')	# read data and drop redundant fields and save in sql database
+
+	sys.exit()
+
 	df2 = (df - df.mean()) / df.std()	# standardise
 	df2 = df2.dropna()			# drop missing values
 
@@ -82,7 +86,7 @@ if __name__ == '__main__':
 		#for d in range(0,max_degree+1):
 		#	ml.perform_svm_classification(Xpos,Xneg,ypos,yneg,"oecd",d)
 		#thlr.perform_classification(Xpos,Xneg,ypos,yneg)
-		#thnn.perform_classification(Xpos,Xneg,ypos,yneg,"oecd","l1")
+		thnn.perform_classification(Xpos,Xneg,ypos,yneg,"oecd","l1")
 		thnn.perform_classification(Xpos,Xneg,ypos,yneg,"oecd","l2")
 		del Xpos, Xneg, ypos, yneg
 
