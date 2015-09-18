@@ -1,14 +1,14 @@
-	# data_mining_tools
+# data_mining_tools
 
 #==============================================================
-Python data mining tools:
-	1) Pandas is used for general data wrangling.
-	2) Data can be read in directly from a text file into the pandas data frame, or via an SQL database.
-	3) Regression and Classifcation machine learning tasks are performed using scikit-learn.
-	4) Classification applications using neural networks and logistic regression to be re-implemented using Theano.
+#Python data mining tools:
+1) Pandas is used for general data wrangling.
+2) Data can be read in directly from a text file into the pandas data frame, or via an SQL database.
+3) Regression and Classifcation machine learning tasks are performed using scikit-learn.
+4) Classification applications using neural networks and logistic regression to be re-implemented using Theano.
 
 #==============================================================
-The files and directories included in this package are as follows:
+#The files and directories included in this package are as follows:
 
 	process_data.in			- exmaple input deck file containing the input parameters
 	process_data.py			- main program
