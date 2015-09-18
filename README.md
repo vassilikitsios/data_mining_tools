@@ -1,6 +1,9 @@
 #Python Data Mining Tools:
+
 1) Pandas is used for general data wrangling.
+
 2) Data can be read in directly from a text file into the pandas data frame, or via an SQL database.
+
 3) Regression and Classifcation machine learning tasks are performed using scikit-learn.
 
 #The files and directories included in this package are as follows:
@@ -26,5 +29,7 @@
 		visualisation_sb.py	- source to produce seaborn correlation and pair plots
 
 #To do list
+
 1) add pandas and SQL to a master database class with additional options for: MongoDB; Hadoop; Spark
+
 2) integrate theano neural network source into machine learning library
