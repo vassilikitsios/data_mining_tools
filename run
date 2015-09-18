@@ -1,0 +1,23 @@
+#!/bin/bash
+#-------------------------------------------------------
+# To run this script simply type the following at the command prompt
+#	./run
+# You will need to first ensure that the environment variable 'py'
+# is set to the appropriate 'python' location for your system
+
+py=ipython
+bin_name=process_data
+bin=$bin_name.py
+input_deck=$bin_name.in
+
+#-------------------------------------------------------
+# clean up directory
+rm -vrf results ; mkdir -p ./results
+
+#-------------------------------------------------------
+# running program
+$py $bin $input_deck 1>$bin_name.out 2>$bin_name.err
+ 
+#-------------------------------------------------------
+# EOF
+#-------------------------------------------------------

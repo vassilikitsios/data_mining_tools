@@ -1,0 +1,60 @@
+#-------------------------------------------------------
+# Input deck for process_data.py
+#	lines starting with '#' are comments
+#
+#-------------------------------------------------------
+# DATA WRANGLING:
+#
+# location of raw data
+data_dir = ~/0data
+#
+# database to use for data wrangling
+database = pandas
+#database = SQL
+#
+#-------------------------------------------------------
+# CLASSIFICATION:
+#
+# build classification model for countries in OECD
+perform_classification = true
+#perform_classification = false
+#
+# for regularisation
+number_of_regularisation_levels_classification = 10
+min_log_of_regularisation_level_classification = -5
+max_log_of_regularisation_level_classification = 1
+#
+# for learning curves
+number_of_proportions_of_samples_classification = 10
+min_proportion_of_samples_classification = 0.2
+#
+#-------------------------------------------------------
+# REGRESSION:
+#
+# build regression model for average life expectancy of a country
+perform_regression = true
+#perform_regression = false
+#
+# for regularisation
+number_of_regularisation_levels_regression = 10
+min_log_of_regularisation_level_regression = -5
+max_log_of_regularisation_level_regression = 1
+#
+# for learning curves
+number_of_proportions_of_samples_regression = 10
+min_proportion_of_samples_regression = 0.2
+#
+#-------------------------------------------------------
+# VISUALISATION:
+#
+# visualise the raw data as correlation and pair plots
+perform_visualisation = true
+#perform_visualisation = false
+#
+# format for writing plots to file
+file_format = png
+#file_format = eps
+#
+#-------------------------------------------------------
+# EOF
+#-------------------------------------------------------
