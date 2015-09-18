@@ -10,20 +10,11 @@ from libMachineLearning.classification import ClassificationAlgorythm
 from libMachineLearning.regression import RegressionAlgorythm 
 
 #=====================================================================
-# README:
-#=====================================================================
-# Code used to generate results for various blog posts hosted at 
+# This code is used to generate results for various blog posts hosted at 
 #       http://dataminingtheworld.blogspot.com.au/
 # including:
 #	linear regression of life expectancy with regularisation and learning curves
 # 	classification of OECD countries with regularisation and learning curves
-
-#=====================================================================
-# to do list:
-#=====================================================================
-# 1) add pandas and SQL to a master database class with additional options for:
-#       MongoDB; Hadoop; Spark
-# 2) integrate theano neural network source into machine learning library
 
 #=====================================================================
 # Main program
