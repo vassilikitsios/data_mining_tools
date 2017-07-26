@@ -1,4 +1,6 @@
-#Python Data Mining Tools:
+----------------------------------------------------------
+Python Data Mining Tools
+----------------------------------------------------------
 
 1) Pandas is used for general data wrangling.
 
@@ -28,7 +30,12 @@
 		visualisation.py	- source to produce standard matplotlib line plots
 		visualisation_sb.py	- source to produce seaborn correlation and pair plots
 
-#To do list
+	libTheano/			- library neural networks implemented using Theano
+					- source code needs to be revised to integrate with above libaries
+
+----------------------------------------------------------
+To do list
+----------------------------------------------------------
 
 1) add pandas and SQL to a master database class with additional options for: MongoDB; Hadoop; Spark
 
