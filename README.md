@@ -37,7 +37,7 @@ libTheano/			- library neural networks implemented using Theano
 				- source code needs to be revised to integrate with above libaries
 
 ----------------------------------------------------------
-To do list
+To Do List
 ----------------------------------------------------------
 
 1) add pandas and SQL to a master database class with additional options for: MongoDB; Hadoop; Spark
