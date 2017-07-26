@@ -33,3 +33,5 @@
 1) add pandas and SQL to a master database class with additional options for: MongoDB; Hadoop; Spark
 
 2) integrate theano neural network source into machine learning library
+
+3) upload data, add examples and associated results
